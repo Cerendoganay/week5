@@ -1,6 +1,7 @@
 package msku.ceng.madlab.week5;
 
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TableLayout;
@@ -8,6 +9,7 @@ import android.widget.TableRow;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -50,6 +52,20 @@ public class MainActivity extends AppCompatActivity {
         return board[row][column] == 0;
     }
 
+    public int gameEnded(int row, int col){
+        int symbol = board[row][col];
+        boolean win = true;
+        for(int i=0; i<3; i++){
+            if(board[i][col] != symbol){
+                win = false;
+            }
+        }
+        if(win){
+            return symbol;
+        }
+        return -1;
+    }
+
     class CellListener implements View.OnClickListener{
 
         int row, column;
@@ -73,6 +89,56 @@ public class MainActivity extends AppCompatActivity {
             else{
                 ((Button)v).setText(PLAYER_2);
                 board[row][column] = 2;
+            }
+
+            if(gameEnded(row,column) == -1){
+                player1_Turn =! player1_Turn;
+            }
+            else if(gameEnded(row,column) == 0){
+                Toast.makeText(MainActivity.this, "ıt is a DRAW", Toast.LENGTH_LONG).show();
+            }
+            else if(gameEnded(row,column) == 01){
+                Toast.makeText(MainActivity.this, "ıt is 1 DRAW", Toast.LENGTH_LONG).show();
+            }
+            else{
+                Toast.makeText(MainActivity.this, "ıt is 2 DRAW", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putBoolean("player1Turn",player1_Turn);
+        byte [] boardSingle = new byte[9];
+        for(int i=0; i<3; i++){
+            for(int j=0; j<3; j++){
+                boardSingle[3*i+j] = board[i][j];
+            }
+        }
+        outState.putByteArray("board", boardSingle);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        player1_Turn = savedInstanceState.getBoolean("player1Turn");
+        byte [] boardSingle = savedInstanceState.getByteArray("board");
+        for(int i = 0; i < 9; i++){
+            board[i/3][i%3] = boardSingle[i];
+        }
+
+        TableLayout table = findViewById(R.id.board);
+        for(int i=0; i<3; i++){
+            TableRow row = (TableRow) table.getChildAt(i);
+            for(int j = 0; j<3; j++){
+                Button button = (Button) row.getChildAt(j);
+                if(board[i][j] == 1){
+                    button.setText("X");
+                }
+                else if(board[i][j] == 2){
+                    button.setText("0");
+                }
             }
 
         }
