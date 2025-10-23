@@ -52,19 +52,65 @@ public class MainActivity extends AppCompatActivity {
         return board[row][column] == 0;
     }
 
-    public int gameEnded(int row, int col){
+    public int gameEnded(int row, int col) {
         int symbol = board[row][col];
         boolean win = true;
-        for(int i=0; i<3; i++){
-            if(board[i][col] != symbol){
+
+
+        for (int i = 0; i < 3; i++) {
+            if (board[i][col] != symbol) {
                 win = false;
+                break;
             }
         }
-        if(win){
-            return symbol;
+        if (win) return symbol;
+
+        win = true;
+        for (int j = 0; j < 3; j++) {
+            if (board[row][j] != symbol) {
+                win = false;
+                break;
+            }
         }
+        if (win) return symbol;
+
+
+        if (row == col) {
+            win = true;
+            for (int i = 0; i < 3; i++) {
+                if (board[i][i] != symbol) {
+                    win = false;
+                    break;
+                }
+            }
+            if (win) return symbol;
+        }
+
+        if (row + col == 2) {
+            win = true;
+            for (int i = 0; i < 3; i++) {
+                if (board[i][2 - i] != symbol) {
+                    win = false;
+                    break;
+                }
+            }
+            if (win) return symbol;
+        }
+
+        boolean draw = true;
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (board[i][j] == 0) {
+                    draw = false;
+                    break;
+                }
+            }
+        }
+        if (draw) return 0;
+
         return -1;
     }
+
 
     class CellListener implements View.OnClickListener{
 
